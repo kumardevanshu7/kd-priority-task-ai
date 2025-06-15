@@ -30,7 +30,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
     <!-- Core Animation Libraries (Used Actively) -->
-    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.12/typed.min.js"></script>
@@ -687,6 +686,59 @@
         margin-bottom: 25px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
       }
+
+      /* Carry Forward Section */
+      .carry-forward-container {
+        background-color: var(--ph-new-white);
+        border: 1px solid var(--ph-new-border-color);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 25px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      }
+      .carry-forward-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+      .carry-forward-header h4 {
+        font-family: var(--font-primary);
+        font-size: 1.1em;
+        font-weight: 600;
+        color: var(--ph-new-text-dark);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .carry-forward-header h4 i {
+        color: var(--ph-new-medium-green);
+      }
+      .carry-forward-btn {
+        background-color: var(--ph-new-medium-green);
+        color: var(--ph-new-white);
+        border: none;
+        padding: 10px 16px;
+        border-radius: 8px;
+        font-size: 0.9em;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .carry-forward-btn:hover {
+        background-color: var(--ph-new-dark-green);
+        transform: translateY(-1px);
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+      }
+      .carry-forward-info {
+        font-size: 0.9em;
+        color: var(--ph-new-text-medium);
+        font-weight: 500;
+      }
       .overall-progress-header {
         display: flex;
         justify-content: space-between;
@@ -1041,6 +1093,42 @@
       }
       .task-column li:not(.completed) .task-complete-icon:hover {
         color: var(--ph-new-medium-green);
+      }
+
+      /* Carried Forward Tasks */
+      .task-column li.carried-forward {
+        background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+        border-left: 4px solid #f39c12;
+        position: relative;
+      }
+      /* Removed corner icon - now only shows in message text */
+      .carry-forward-count {
+        font-size: 0.7em;
+        color: #8b4513;
+        font-weight: 600;
+        background: rgba(243, 156, 18, 0.2);
+        padding: 2px 6px;
+        border-radius: 4px;
+        margin-top: 4px;
+        display: inline-block;
+      }
+
+      /* Task Actions */
+      .task-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .task-abort-icon {
+        cursor: pointer;
+        font-size: 1.1em;
+        color: #dc3545;
+        transition: color 0.3s ease, transform 0.2s ease;
+        flex-shrink: 0;
+      }
+      .task-abort-icon:hover {
+        color: #c82333;
+        transform: scale(1.1);
       }
       .task-reason {
         font-size: 0.78em;
@@ -2435,6 +2523,7 @@
               <span id="current-date-display">Select Date</span>
               <input type="date" id="current-date-input" class="hidden" />
               <i class="fas fa-calendar-alt" id="calendar-icon-btn"></i>
+              <i class="fas fa-chevron-right" id="next-day-btn"></i>
             </div>
           </div>
           <nav class="header-nav">
@@ -2641,8 +2730,6 @@
           <section
             class="overall-progress-container"
             id="overall-progress-container"
-            data-aos="fade-up"
-            data-aos-delay="80"
           >
             <div class="overall-progress-header">
               <h4><i class="fas fa-chart-line"></i> Overall Progress</h4>
@@ -2658,51 +2745,43 @@
             </div>
           </section>
 
+          <!-- Carry Forward Section -->
           <section
-            id="task-columns-container"
-            data-aos="fade-up"
-            data-aos-delay="100"
+            class="carry-forward-container"
+            id="carry-forward-container"
+            style="display: none"
           >
-            <div
-              id="very-important-column"
-              class="task-column"
-              data-aos="fade-up"
-              data-aos-delay="0"
-              data-tilt
-            >
+            <div class="carry-forward-header">
+              <h4>
+                <i class="fas fa-arrow-right"></i> Previous Incomplete Tasks
+              </h4>
+              <button class="carry-forward-btn" id="add-previous-tasks-btn">
+                <i class="fas fa-plus"></i> Add Previous Incomplete Tasks
+              </button>
+            </div>
+            <div class="carry-forward-info" id="carry-forward-info">
+              <span id="previous-tasks-count">0</span> incomplete tasks from all
+              previous dates
+            </div>
+          </section>
+
+          <section id="task-columns-container">
+            <div id="very-important-column" class="task-column" data-tilt>
               <h3><i class="fas fa-star"></i> Very Important</h3>
               <ul></ul>
               <p class="motivational-quote" id="quote-very-important"></p>
             </div>
-            <div
-              id="high-priority-column"
-              class="task-column"
-              data-aos="fade-up"
-              data-aos-delay="50"
-              data-tilt
-            >
+            <div id="high-priority-column" class="task-column" data-tilt>
               <h3><i class="fas fa-rocket"></i> High Priority</h3>
               <ul></ul>
               <p class="motivational-quote" id="quote-high-priority"></p>
             </div>
-            <div
-              id="good-good-priority-column"
-              class="task-column"
-              data-aos="fade-up"
-              data-aos-delay="100"
-              data-tilt
-            >
+            <div id="good-good-priority-column" class="task-column" data-tilt>
               <h3><i class="fas fa-thumbs-up"></i> Good-Good Priority</h3>
               <ul></ul>
               <p class="motivational-quote" id="quote-good-good"></p>
             </div>
-            <div
-              id="low-priority-column"
-              class="task-column"
-              data-aos="fade-up"
-              data-aos-delay="150"
-              data-tilt
-            >
+            <div id="low-priority-column" class="task-column" data-tilt>
               <h3><i class="fas fa-mug-hot"></i> Low Priority</h3>
               <ul></ul>
               <p class="motivational-quote" id="quote-low-priority"></p>
@@ -3077,6 +3156,7 @@
       );
       const currentDateInputEl = document.getElementById("current-date-input");
       const prevDayBtn = document.getElementById("prev-day-btn");
+      const nextDayBtn = document.getElementById("next-day-btn");
       const calendarIconBtn = document.getElementById("calendar-icon-btn");
 
       const loadingSpinner = document.getElementById("loading-spinner");
@@ -3091,6 +3171,17 @@
       );
       const toggleBehaviourAnalysisBtn = document.getElementById(
         "toggle-behaviour-analysis-btn"
+      );
+
+      // Carry Forward Elements
+      const carryForwardContainer = document.getElementById(
+        "carry-forward-container"
+      );
+      const addPreviousTasksBtn = document.getElementById(
+        "add-previous-tasks-btn"
+      );
+      const previousTasksCountEl = document.getElementById(
+        "previous-tasks-count"
       );
       const backToTasksFromBehaviourBtn = document.getElementById(
         "back-to-tasks-from-behaviour-btn"
@@ -3204,7 +3295,7 @@
 
       // --- Animation Initializations ---
       function initAnimations() {
-        AOS.init({ duration: 600, easing: "ease-out-cubic", once: true });
+        // AOS removed for better performance - tasks now appear instantly
         if (
           typeof Typed === "function" &&
           document.getElementById("hero-animated-title")
@@ -3323,6 +3414,11 @@
       }
       prevDayBtn.addEventListener("click", () => {
         selectedDate.setDate(selectedDate.getDate() - 1);
+        updateDateDisplayAndLoadTasks();
+      });
+
+      nextDayBtn.addEventListener("click", () => {
+        selectedDate.setDate(selectedDate.getDate() + 1);
         updateDateDisplayAndLoadTasks();
       });
 
@@ -4103,30 +4199,42 @@
         if (currentTaskForMood) {
           const { taskItem } = currentTaskForMood;
 
-          // Add mood to task data
-          taskItem.mood = mood;
-          taskItem.moodEmoji = emoji;
-          taskItem.moodTimestamp = new Date().toISOString();
+          // Show loading state
+          showLoading(true);
 
-          // Add mood indicator to task UI
-          addMoodIndicatorToTask(taskItem, emoji);
+          try {
+            // Add mood to task data
+            taskItem.mood = mood;
+            taskItem.moodEmoji = emoji;
+            taskItem.moodTimestamp = new Date().toISOString();
 
-          // Save to database (both task data and mood data)
-          await saveTasksToFirestore(
-            selectedDate,
-            analyzedTaskDataForSelectedDate
-          );
-          await saveMoodToFirestore(selectedDate, mood, emoji, taskItem.task);
+            // Add mood indicator to task UI
+            addMoodIndicatorToTask(taskItem, emoji);
 
-          // Calculate and update streak after task completion
-          await calculateAndUpdateStreak();
+            // Perform all backend operations in sequence
+            await Promise.all([
+              saveTasksToFirestore(
+                selectedDate,
+                analyzedTaskDataForSelectedDate
+              ),
+              saveMoodToFirestore(selectedDate, mood, emoji, taskItem.task),
+            ]);
 
-          closeMoodSelection();
+            // Calculate and update streak after task completion
+            await calculateAndUpdateStreak();
 
-          showSuccessAlert(
-            "Mood Recorded",
-            `Task completed with ${emoji} mood!`
-          );
+            closeMoodSelection();
+
+            // No success popup - operations complete silently
+          } catch (error) {
+            console.error("Error completing task:", error);
+            showErrorAlert(
+              "Error",
+              "Failed to complete task. Please try again."
+            );
+          } finally {
+            showLoading(false);
+          }
 
           // Update mood analytics if behavioral analysis is visible
           if (!taskBehaviouralAnalysisSection.classList.contains("hidden")) {
@@ -4301,6 +4409,176 @@
         }
       }
 
+      // --- Carry Forward Functionality ---
+      async function checkAndShowCarryForward() {
+        if (!currentUser) return;
+
+        try {
+          const totalIncompleteCount = await getAllPreviousIncompleteTasks(
+            true
+          ); // Just count
+
+          if (totalIncompleteCount > 0) {
+            previousTasksCountEl.textContent = totalIncompleteCount;
+            carryForwardContainer.style.display = "block";
+          } else {
+            carryForwardContainer.style.display = "none";
+          }
+        } catch (error) {
+          console.error("Error checking carry forward:", error);
+          carryForwardContainer.style.display = "none";
+        }
+      }
+
+      // Get all incomplete tasks from all previous dates (last 30 days)
+      async function getAllPreviousIncompleteTasks(countOnly = false) {
+        if (!currentUser) return countOnly ? 0 : [];
+
+        try {
+          const allIncompleteTasks = [];
+          let totalCount = 0;
+
+          // Check last 30 days for incomplete tasks
+          for (let i = 1; i <= 30; i++) {
+            const checkDate = new Date(
+              selectedDate.getTime() - i * 24 * 60 * 60 * 1000
+            );
+            const dateKey = formatDate(checkDate);
+
+            try {
+              const docRef = doc(
+                db,
+                "dailyTasks",
+                `${currentUser.uid}-${dateKey}`
+              );
+              const docSnap = await getDoc(docRef);
+
+              if (docSnap.exists()) {
+                const data = docSnap.data();
+                const incompleteTasks = getIncompleteTasks(data);
+
+                if (countOnly) {
+                  totalCount += incompleteTasks.length;
+                } else {
+                  // Add date info to each task
+                  incompleteTasks.forEach((task) => {
+                    task.originalDate = dateKey;
+                    task.daysSinceOriginal = i;
+                    allIncompleteTasks.push(task);
+                  });
+                }
+              }
+            } catch (docError) {
+              // Skip this date if there's an error (normal for dates with no data)
+            }
+          }
+
+          return countOnly ? totalCount : allIncompleteTasks;
+        } catch (error) {
+          console.error("Error getting all previous incomplete tasks:", error);
+          return countOnly ? 0 : [];
+        }
+      }
+
+      function getIncompleteTasksCount(taskData) {
+        if (!taskData) return 0;
+        let incomplete = 0;
+        Object.keys(taskData).forEach((category) => {
+          if (Array.isArray(taskData[category])) {
+            incomplete += taskData[category].filter(
+              (task) => !task.completed
+            ).length;
+          }
+        });
+        return incomplete;
+      }
+
+      async function addPreviousIncompleteTasks() {
+        if (!currentUser) return;
+
+        try {
+          showLoading(true);
+
+          // Get all incomplete tasks from all previous dates
+          const allIncompleteTasks = await getAllPreviousIncompleteTasks(false);
+
+          if (allIncompleteTasks.length > 0) {
+            // Add carry forward count to each task
+            allIncompleteTasks.forEach((task) => {
+              task.carryForwardCount = (task.carryForwardCount || 0) + 1;
+              task.isCarriedForward = true;
+              // daysSinceOriginal already calculated in getAllPreviousIncompleteTasks
+            });
+
+            // Merge with current day's tasks
+            const mergedData = mergeCarryForwardTasks(
+              analyzedTaskDataForSelectedDate,
+              allIncompleteTasks
+            );
+            await saveTasksToFirestore(selectedDate, mergedData);
+
+            // Hide carry forward section
+            carryForwardContainer.style.display = "none";
+
+            showSuccessAlert(
+              "Tasks Added!",
+              `${allIncompleteTasks.length} incomplete tasks from all previous dates have been added.`
+            );
+          }
+        } catch (error) {
+          console.error("Error adding carry forward tasks:", error);
+          showErrorAlert(
+            "Error",
+            "Failed to add previous tasks. Please try again."
+          );
+        } finally {
+          showLoading(false);
+        }
+      }
+
+      function getIncompleteTasks(taskData) {
+        const incompleteTasks = [];
+        if (!taskData) return incompleteTasks;
+
+        Object.keys(taskData).forEach((category) => {
+          if (Array.isArray(taskData[category])) {
+            taskData[category].forEach((task) => {
+              if (!task.completed) {
+                // Aborted tasks are completely removed, so no need to check for them
+                incompleteTasks.push({
+                  ...task,
+                  originalCategory: category,
+                });
+              }
+            });
+          }
+        });
+        return incompleteTasks;
+      }
+
+      function mergeCarryForwardTasks(currentData, carryForwardTasks) {
+        const mergedData = currentData
+          ? JSON.parse(JSON.stringify(currentData))
+          : {};
+
+        carryForwardTasks.forEach((task) => {
+          const category = task.originalCategory;
+          if (!mergedData[category]) {
+            mergedData[category] = [];
+          }
+          mergedData[category].push(task);
+        });
+
+        return mergedData;
+      }
+
+      // Helper function for ordinal numbers
+      function getOrdinal(num) {
+        const suffixes = ["th", "st", "nd", "rd"];
+        const v = num % 100;
+        return num + (suffixes[(v - 20) % 10] || suffixes[v] || suffixes[0]);
+      }
+
       async function loadCurrentStreak() {
         if (!currentUser) return;
 
@@ -4437,6 +4715,7 @@
         let total = 0;
         Object.keys(taskData).forEach((category) => {
           if (Array.isArray(taskData[category])) {
+            // Aborted tasks are now completely removed, so no need to filter
             total += taskData[category].length;
           }
         });
@@ -4652,10 +4931,7 @@
           const dateKey = formatDate(date);
           const docRef = doc(db, "dailyTasks", `${currentUser.uid}-${dateKey}`);
           await setDoc(docRef, { ...dataToSave, lastUpdated: Timestamp.now() });
-          showSuccessAlert(
-            "Tasks Saved!",
-            `Tasks for ${formatDateForDisplay(date)} saved.`
-          );
+          // Tasks saved silently - no popup needed
           analyzedTaskDataForSelectedDate = dataToSave;
           renderAnalyzedTasksUI();
           if (!taskBehaviouralAnalysisSection.classList.contains("hidden")) {
@@ -4692,6 +4968,9 @@
         } finally {
           renderAnalyzedTasksUI();
           showLoading(false);
+
+          // Check for carry forward tasks after loading
+          await checkAndShowCarryForward();
         }
       }
 
@@ -4816,7 +5095,12 @@
           const tasksInCategory = analyzedTaskDataForSelectedDate[categoryKey];
           if (tasksInCategory && Array.isArray(tasksInCategory)) {
             tasksInCategory.forEach((task) => {
-              if (task && typeof task === "object" && "task" in task) {
+              if (
+                task &&
+                typeof task === "object" &&
+                "task" in task &&
+                !task.aborted
+              ) {
                 totalCreated++;
                 if (task.completed) totalCompleted++;
               }
@@ -4872,7 +5156,9 @@
             tasksInCategory.forEach((taskItem) => {
               const li = document.createElement("li");
               if (taskItem.completed) li.classList.add("completed");
-              li.setAttribute("data-aos", "fade-up");
+              if (taskItem.isCarriedForward)
+                li.classList.add("carried-forward");
+              // Remove AOS attribute for instant visibility
 
               // Main content with task text and emoji
               const mainContentDiv = document.createElement("div");
@@ -4894,6 +5180,10 @@
                 textAndEmojiDiv.firstChild
               );
               mainContentDiv.appendChild(textAndEmojiDiv);
+
+              // Task actions container
+              const taskActions = document.createElement("div");
+              taskActions.classList.add("task-actions");
 
               // Complete/incomplete toggle icon
               const tickIcon = document.createElement("i");
@@ -4938,7 +5228,74 @@
                   analyzedTaskDataForSelectedDate
                 );
               });
-              mainContentDiv.appendChild(tickIcon);
+
+              // Abort task icon
+              const abortIcon = document.createElement("i");
+              abortIcon.classList.add("fas", "fa-times", "task-abort-icon");
+              abortIcon.title = "Abort this task";
+              abortIcon.addEventListener("click", async (e) => {
+                e.stopPropagation();
+
+                const confirmed = await Swal.fire({
+                  title: "Abort Task?",
+                  text: "This task will be removed and marked as aborted.",
+                  icon: "warning",
+                  showCancelButton: true,
+                  confirmButtonColor: "#dc3545",
+                  cancelButtonColor: "#6c757d",
+                  confirmButtonText: "Yes, abort it!",
+                });
+
+                if (confirmed.isConfirmed) {
+                  try {
+                    // Find and remove the task from the data structure
+                    const categoryKey = categoryKeyFromMap;
+                    const tasksInCategory =
+                      analyzedTaskDataForSelectedDate[categoryKey];
+
+                    if (tasksInCategory && Array.isArray(tasksInCategory)) {
+                      const taskIndex = tasksInCategory.findIndex(
+                        (task) =>
+                          task.task === taskItem.task &&
+                          task.emoji === taskItem.emoji
+                      );
+
+                      if (taskIndex !== -1) {
+                        // Remove the task completely from the array
+                        tasksInCategory.splice(taskIndex, 1);
+                      }
+                    }
+
+                    // Remove from UI immediately
+                    li.remove();
+
+                    // Update progress bar and dashboard
+                    updateOverallProgressBar();
+                    updateDashboardUI();
+
+                    // Save updated data to database
+                    await saveTasksToFirestore(
+                      selectedDate,
+                      analyzedTaskDataForSelectedDate
+                    );
+
+                    showSuccessAlert(
+                      "Task Aborted",
+                      "Task has been permanently removed from your list."
+                    );
+                  } catch (error) {
+                    console.error("Error aborting task:", error);
+                    showErrorAlert(
+                      "Error",
+                      "Failed to abort task. Please try again."
+                    );
+                  }
+                }
+              });
+
+              taskActions.appendChild(tickIcon);
+              taskActions.appendChild(abortIcon);
+              mainContentDiv.appendChild(taskActions);
               li.appendChild(mainContentDiv);
 
               // Enhanced reason with priority indicators
@@ -4947,6 +5304,15 @@
                 reasonDiv.classList.add("task-reason");
                 reasonDiv.textContent = taskItem.reason;
                 li.appendChild(reasonDiv);
+              }
+
+              // Carry forward counter
+              if (taskItem.isCarriedForward && taskItem.carryForwardCount) {
+                const carryCountDiv = document.createElement("div");
+                carryCountDiv.classList.add("carry-forward-count");
+                const ordinal = getOrdinal(taskItem.carryForwardCount + 1);
+                carryCountDiv.textContent = `↻ ${ordinal} time running this task`;
+                li.appendChild(carryCountDiv);
               }
 
               // Enhanced meta section with priority score and confidence
@@ -4993,7 +5359,7 @@
         });
         updateDashboardUI();
         updateOverallProgressBar(); // Update overall progress bar after rendering tasks
-        AOS.refresh();
+        // AOS removed for better performance
         // Safe task tilt initialization
         function initializeTaskTiltEffects() {
           try {
@@ -5057,6 +5423,7 @@
             const tasksInCategory =
               analyzedTaskDataForSelectedDate[categoryKey];
             if (Array.isArray(tasksInCategory)) {
+              // Aborted tasks are now completely removed, so no need to filter
               totalTasks += tasksInCategory.length;
               completedTasks += tasksInCategory.filter(
                 (task) => task.completed
@@ -5121,7 +5488,7 @@
                 { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }
               );
               if (isBehaviourHidden) loadAndDisplayBehaviouralAnalysis();
-              AOS.refresh();
+              // AOS removed for better performance
             },
           });
         });
@@ -5141,7 +5508,7 @@
                 { opacity: 0 },
                 { opacity: 1, duration: 0.3, ease: "power2.out" }
               );
-              AOS.refresh();
+              // AOS removed for better performance
             },
           });
         });
@@ -5479,7 +5846,17 @@
         // Initialize simple username functionality
         initializeNameDropdown();
 
-        console.log("PriorityHelp AI Initialized with final UI updates! 🌿✨");
+        // Initialize carry forward functionality
+        if (addPreviousTasksBtn) {
+          addPreviousTasksBtn.addEventListener(
+            "click",
+            addPreviousIncompleteTasks
+          );
+        }
+
+        console.log(
+          "PriorityHelp AI Initialized with enhanced UX features! 🌿✨"
+        );
       }
 
       function init() {
