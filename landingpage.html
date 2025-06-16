@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PriorityHelp AI - Smart Task Management</title>
+    <link
+      rel="shortcut icon"
+      href="https://shorturl.at/cQmMr"
+      type="image/x-icon"
+    />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+
+    <style>
+      :root {
+        /* Plantitas UI Theme Colors */
+        --ph-new-bg-page: #f3f5f0;
+        --ph-new-white: #ffffff;
+        --ph-new-dark-green: #253528;
+        --ph-new-medium-green: #49654e;
+        --ph-new-light-green: #8ba889;
+        --ph-new-soft-green-bg: #e9efe8;
+
+        --ph-new-text-dark: var(--ph-new-dark-green);
+        --ph-new-text-medium: var(--ph-new-medium-green);
+        --ph-new-text-light-on-dark: var(--ph-new-white);
+        --ph-new-text-placeholder: #a0a0a0;
+
+        --ph-new-border-color: #dce1da;
+        --ph-new-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        --ph-new-shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.08);
+
+        --font-primary: "Poppins", sans-serif;
+
+        /* Accent colors */
+        --accent-blue: #7ba0c9;
+        --accent-red: #d48484;
+        --accent-yellow: #e6c57f;
+        --accent-purple: #a98abe;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: var(--font-primary);
+        background-color: var(--ph-new-bg-page);
+        color: var(--ph-new-text-dark);
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+
+      /* Header Styles */
+      .landing-header {
+        background: var(--ph-new-white);
+        box-shadow: var(--ph-new-shadow);
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        transition: all 0.3s ease;
+      }
+
+      .header-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 70px;
+      }
+
+      .logo-section {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .logo-placeholder {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .logo-placeholder img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 10px;
+      }
+
+      .logo-text {
+        font-size: 1.5em;
+        font-weight: 600;
+        color: var(--ph-new-dark-green);
+      }
+
+      .header-nav {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .nav-link {
+        text-decoration: none;
+        color: var(--ph-new-text-medium);
+        font-weight: 500;
+        transition: color 0.3s ease;
+        position: relative;
+      }
+
+      .nav-link:hover {
+        color: var(--ph-new-dark-green);
+      }
+
+      .nav-link::after {
+        content: "";
+        position: absolute;
+        bottom: -5px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: var(--ph-new-light-green);
+        transition: width 0.3s ease;
+      }
+
+      .nav-link:hover::after {
+        width: 100%;
+      }
+
+      .header-buttons {
+        display: flex;
+        gap: 12px;
+      }
+
+      .btn {
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        border: none;
+        font-size: 0.95em;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .btn-primary {
+        background: var(--ph-new-dark-green);
+        color: var(--ph-new-white);
+        box-shadow: 0 3px 10px rgba(37, 53, 40, 0.2);
+      }
+
+      .btn-primary:hover {
+        background: var(--ph-new-medium-green);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(37, 53, 40, 0.25);
+      }
+
+      .btn-secondary {
+        background: transparent;
+        color: var(--ph-new-dark-green);
+        border: 2px solid var(--ph-new-medium-green);
+      }
+
+      .btn-secondary:hover {
+        background: var(--ph-new-light-green);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(37, 53, 40, 0.15);
+      }
+
+      /* Hero Section */
+      .hero-section {
+        padding: 120px 20px 80px;
+        text-align: center;
+        background: linear-gradient(
+          135deg,
+          var(--ph-new-bg-page) 0%,
+          var(--ph-new-soft-green-bg) 100%
+        );
+        position: relative;
+        overflow: hidden;
+      }
+
+      .hero-section::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="%23253528" opacity="0.02"/><circle cx="75" cy="75" r="1" fill="%23253528" opacity="0.02"/><circle cx="50" cy="10" r="1" fill="%23253528" opacity="0.02"/><circle cx="10" cy="60" r="1" fill="%23253528" opacity="0.02"/><circle cx="90" cy="40" r="1" fill="%23253528" opacity="0.02"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+        pointer-events: none;
+      }
+
+      .hero-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 2;
+      }
+
+      .hero-title {
+        font-size: 3.5em;
+        font-weight: 700;
+        color: var(--ph-new-dark-green);
+        margin-bottom: 20px;
+        line-height: 1.2;
+      }
+
+      .hero-subtitle {
+        font-size: 1.3em;
+        color: var(--ph-new-text-medium);
+        margin-bottom: 40px;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .hero-buttons {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        margin-bottom: 60px;
+      }
+
+      .btn-hero {
+        padding: 16px 32px;
+        font-size: 1.1em;
+        font-weight: 600;
+        border-radius: 12px;
+      }
+
+      .hero-features {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 30px;
+        margin-top: 80px;
+      }
+
+      .hero-feature {
+        background: var(--ph-new-white);
+        padding: 30px 20px;
+        border-radius: 16px;
+        box-shadow: var(--ph-new-shadow);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .hero-feature:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--ph-new-shadow-hover);
+      }
+
+      .hero-feature-icon {
+        font-size: 2.5em;
+        color: var(--ph-new-light-green);
+        margin-bottom: 20px;
+      }
+
+      .hero-feature h3 {
+        font-size: 1.3em;
+        font-weight: 600;
+        color: var(--ph-new-dark-green);
+        margin-bottom: 15px;
+      }
+
+      .hero-feature p {
+        color: var(--ph-new-text-medium);
+        line-height: 1.6;
+      }
+
+      /* Features Section */
+      .features-section {
+        padding: 100px 20px;
+        background: var(--ph-new-white);
+      }
+
+      .features-container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .section-header {
+        text-align: center;
+        margin-bottom: 80px;
+      }
+
+      .section-title {
+        font-size: 2.8em;
+        font-weight: 700;
+        color: var(--ph-new-dark-green);
+        margin-bottom: 20px;
+      }
+
+      .section-subtitle {
+        font-size: 1.2em;
+        color: var(--ph-new-text-medium);
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 40px;
+      }
+
+      .feature-card {
+        background: var(--ph-new-soft-green-bg);
+        padding: 40px 30px;
+        border-radius: 20px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: 1px solid var(--ph-new-border-color);
+      }
+
+      .feature-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 40px rgba(37, 53, 40, 0.1);
+      }
+
+      .feature-icon {
+        width: 60px;
+        height: 60px;
+        background: var(--ph-new-light-green);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8em;
+        color: var(--ph-new-dark-green);
+        margin-bottom: 25px;
+      }
+
+      .feature-card h3 {
+        font-size: 1.5em;
+        font-weight: 600;
+        color: var(--ph-new-dark-green);
+        margin-bottom: 15px;
+      }
+
+      .feature-card p {
+        color: var(--ph-new-text-medium);
+        line-height: 1.7;
+        margin-bottom: 20px;
+      }
+
+      .feature-list {
+        list-style: none;
+        padding: 0;
+      }
+
+      .feature-list li {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+        color: var(--ph-new-text-medium);
+      }
+
+      .feature-list li i {
+        color: var(--ph-new-light-green);
+        font-size: 0.9em;
+      }
+
+      /* Mobile Responsiveness */
+      @media (max-width: 768px) {
+        .header-container {
+          padding: 0 15px;
+          height: 60px;
+        }
+
+        .logo-text {
+          font-size: 1.3em;
+        }
+
+        .header-nav {
+          display: none;
+        }
+
+        .hero-section {
+          padding: 100px 15px 60px;
+        }
+
+        .hero-title {
+          font-size: 2.5em;
+        }
+
+        .hero-subtitle {
+          font-size: 1.1em;
+        }
+
+        .hero-buttons {
+          flex-direction: column;
+          align-items: center;
+          gap: 15px;
+        }
+
+        .btn-hero {
+          width: 100%;
+          max-width: 300px;
+        }
+
+        .hero-features {
+          grid-template-columns: 1fr;
+          gap: 20px;
+          margin-top: 60px;
+        }
+
+        .features-section {
+          padding: 80px 15px;
+        }
+
+        .section-title {
+          font-size: 2.2em;
+        }
+
+        .features-grid {
+          grid-template-columns: 1fr;
+          gap: 30px;
+        }
+
+        .feature-card {
+          padding: 30px 20px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .hero-title {
+          font-size: 2em;
+        }
+
+        .hero-subtitle {
+          font-size: 1em;
+        }
+
+        .btn-hero {
+          padding: 14px 24px;
+          font-size: 1em;
+        }
+
+        .section-title {
+          font-size: 1.8em;
+        }
+
+        .feature-card {
+          padding: 25px 15px;
+        }
+      }
+
+      /* Benefits Section */
+      .benefits-section {
+        padding: 100px 20px;
+        background: var(--ph-new-bg-page);
+      }
+
+      .benefits-container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .benefits-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 30px;
+        margin-top: 60px;
+      }
+
+      .benefit-card {
+        background: var(--ph-new-white);
+        padding: 40px 30px;
+        border-radius: 16px;
+        box-shadow: var(--ph-new-shadow);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .benefit-card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--ph-new-shadow-hover);
+      }
+
+      .benefit-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(
+          90deg,
+          var(--ph-new-light-green),
+          var(--ph-new-medium-green)
+        );
+      }
+
+      .benefit-number {
+        font-size: 3em;
+        font-weight: 700;
+        color: var(--ph-new-light-green);
+        opacity: 0.3;
+        margin-bottom: 20px;
+        line-height: 1;
+      }
+
+      .benefit-card h3 {
+        font-size: 1.4em;
+        font-weight: 600;
+        color: var(--ph-new-dark-green);
+        margin-bottom: 15px;
+      }
+
+      .benefit-card p {
+        color: var(--ph-new-text-medium);
+        line-height: 1.7;
+      }
+
+      /* Testimonials Section */
+      .testimonials-section {
+        padding: 100px 20px;
+        background: var(--ph-new-white);
+      }
+
+      .testimonials-container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .testimonials-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 30px;
+        margin-top: 60px;
+      }
+
+      .testimonial-card {
+        background: var(--ph-new-soft-green-bg);
+        padding: 30px;
+        border-radius: 16px;
+        border: 1px solid var(--ph-new-border-color);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .testimonial-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--ph-new-shadow);
+      }
+
+      .testimonial-content {
+        margin-bottom: 25px;
+      }
+
+      .stars {
+        display: flex;
+        gap: 5px;
+        margin-bottom: 20px;
+      }
+
+      .stars i {
+        color: #ffd700;
+        font-size: 1.1em;
+      }
+
+      .testimonial-content p {
+        color: var(--ph-new-text-dark);
+        line-height: 1.7;
+        font-style: italic;
+        font-size: 1.05em;
+      }
+
+      .testimonial-author {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .author-avatar {
+        width: 50px;
+        height: 50px;
+        background: var(--ph-new-light-green);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--ph-new-dark-green);
+        font-size: 1.2em;
+      }
+
+      .author-info h4 {
+        color: var(--ph-new-dark-green);
+        font-weight: 600;
+        margin-bottom: 5px;
+      }
+
+      .author-info span {
+        color: var(--ph-new-text-medium);
+        font-size: 0.9em;
+      }
+
+      /* CTA Section */
+      .cta-section {
+        padding: 100px 20px;
+        background: linear-gradient(
+          135deg,
+          var(--ph-new-dark-green) 0%,
+          var(--ph-new-medium-green) 100%
+        );
+        text-align: center;
+        color: var(--ph-new-white);
+      }
+
+      .cta-container {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+
+      .cta-content h2 {
+        font-size: 2.5em;
+        font-weight: 700;
+        margin-bottom: 20px;
+      }
+
+      .cta-content p {
+        font-size: 1.2em;
+        margin-bottom: 40px;
+        opacity: 0.9;
+      }
+
+      .cta-buttons {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        margin-bottom: 30px;
+      }
+
+      .cta-note {
+        font-size: 0.9em;
+        opacity: 0.8;
+        margin-top: 20px;
+      }
+
+      /* Footer */
+      .landing-footer {
+        background: var(--ph-new-dark-green);
+        color: var(--ph-new-white);
+        padding: 60px 20px 20px;
+      }
+
+      .footer-container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .footer-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 60px;
+        margin-bottom: 40px;
+      }
+
+      .footer-logo .logo-section {
+        margin-bottom: 20px;
+      }
+
+      .footer-logo .logo-text {
+        color: var(--ph-new-white);
+      }
+
+      .footer-logo p {
+        color: rgba(255, 255, 255, 0.8);
+        line-height: 1.6;
+      }
+
+      .footer-links {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+      }
+
+      .footer-column h4 {
+        color: var(--ph-new-white);
+        font-weight: 600;
+        margin-bottom: 20px;
+      }
+
+      .footer-column a {
+        display: block;
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+        margin-bottom: 10px;
+        transition: color 0.3s ease;
+      }
+
+      .footer-column a:hover {
+        color: var(--ph-new-light-green);
+      }
+
+      .footer-bottom {
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+        padding-top: 20px;
+        text-align: center;
+      }
+
+      .footer-bottom p {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.9em;
+      }
+
+      /* Additional Mobile Styles */
+      @media (max-width: 768px) {
+        .benefits-section,
+        .testimonials-section {
+          padding: 80px 15px;
+        }
+
+        .benefits-grid,
+        .testimonials-grid {
+          grid-template-columns: 1fr;
+          gap: 25px;
+        }
+
+        .benefit-card,
+        .testimonial-card {
+          padding: 30px 20px;
+        }
+
+        .cta-section {
+          padding: 80px 15px;
+        }
+
+        .cta-content h2 {
+          font-size: 2em;
+        }
+
+        .cta-buttons {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .footer-content {
+          grid-template-columns: 1fr;
+          gap: 40px;
+        }
+
+        .footer-links {
+          grid-template-columns: 1fr;
+          gap: 30px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="landing-header">
+      <div class="header-container">
+        <div class="logo-section">
+          <div class="logo-placeholder">
+            <img src="https://shorturl.at/cQmMr" alt="PriorityHelp AI Logo" />
+          </div>
+          <div class="logo-text">PriorityHelp AI</div>
+        </div>
+
+        <nav class="header-nav">
+          <a href="#features" class="nav-link">Features</a>
+          <a href="#benefits" class="nav-link">Benefits</a>
+          <!-- <a href="#testimonials" class="nav-link">Reviews</a> -->
+        </nav>
+
+        <div class="header-buttons">
+          <a href="login.html" class="btn btn-secondary">
+            <i class="fas fa-sign-in-alt"></i>
+            Sign In
+          </a>
+          <a href="login.html#register" class="btn btn-primary">
+            <i class="fas fa-rocket"></i>
+            Get Started
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="hero-container">
+        <h1 class="hero-title" data-aos="fade-up">
+          Smart Task Management<br />
+          <span style="color: var(--ph-new-light-green)">Powered by AI</span>
+        </h1>
+
+        <p class="hero-subtitle" data-aos="fade-up" data-aos-delay="200">
+          Transform your productivity with intelligent task prioritization,
+          AI-driven insights, and comprehensive analytics. Get more done with
+          less stress.
+        </p>
+
+        <div class="hero-buttons" data-aos="fade-up" data-aos-delay="400">
+          <a href="login.html#register" class="btn btn-primary btn-hero">
+            <i class="fas fa-rocket"></i>
+            Start Free Today
+          </a>
+          <a href="login.html" class="btn btn-secondary btn-hero">
+            <i class="fas fa-sign-in-alt"></i>
+            Sign In
+          </a>
+        </div>
+
+        <div class="hero-features">
+          <div class="hero-feature" data-aos="fade-up" data-aos-delay="600">
+            <div class="hero-feature-icon">
+              <i class="fas fa-brain"></i>
+            </div>
+            <h3>AI-Powered Prioritization</h3>
+            <p>
+              Let our advanced AI analyze and categorize your tasks
+              automatically, ensuring you focus on what matters most.
+            </p>
+          </div>
+
+          <div class="hero-feature" data-aos="fade-up" data-aos-delay="700">
+            <div class="hero-feature-icon">
+              <i class="fas fa-chart-line"></i>
+            </div>
+            <h3>Comprehensive Analytics</h3>
+            <p>
+              Track your productivity patterns, mood trends, and completion
+              rates with beautiful, insightful dashboards.
+            </p>
+          </div>
+
+          <div class="hero-feature" data-aos="fade-up" data-aos-delay="800">
+            <div class="hero-feature-icon">
+              <i class="fas fa-clock"></i>
+            </div>
+            <h3>Focus Mode & Timers</h3>
+            <p>
+              Built-in Pomodoro timers and focus sessions help you maintain
+              concentration and boost productivity.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section" id="features">
+      <div class="features-container">
+        <div class="section-header">
+          <h2 class="section-title" data-aos="fade-up">
+            Everything You Need to Stay Productive
+          </h2>
+          <p class="section-subtitle" data-aos="fade-up" data-aos-delay="200">
+            Discover powerful features designed to streamline your workflow and
+            maximize your efficiency
+          </p>
+        </div>
+
+        <div class="features-grid">
+          <div class="feature-card" data-aos="fade-up" data-aos-delay="300">
+            <div class="feature-icon">
+              <i class="fas fa-tasks"></i>
+            </div>
+            <h3>Smart Task Organization</h3>
+            <p>
+              Organize tasks by priority levels with AI assistance. Never miss
+              important deadlines again.
+            </p>
+            <ul class="feature-list">
+              <li>
+                <i class="fas fa-check"></i> Very Important, High, Good & Low
+                Priority
+              </li>
+              <li><i class="fas fa-check"></i> Date-based task planning</li>
+              <li><i class="fas fa-check"></i> Automatic categorization</li>
+              <li><i class="fas fa-check"></i> Progress tracking</li>
+            </ul>
+          </div>
+
+          <div class="feature-card" data-aos="fade-up" data-aos-delay="400">
+            <div class="feature-icon">
+              <i class="fas fa-robot"></i>
+            </div>
+            <h3>AI-Powered Analysis</h3>
+            <p>
+              Advanced AI analyzes your tasks and provides intelligent
+              prioritization recommendations.
+            </p>
+            <ul class="feature-list">
+              <li><i class="fas fa-check"></i> Google Gemini AI integration</li>
+              <li><i class="fas fa-check"></i> Context-aware prioritization</li>
+              <li><i class="fas fa-check"></i> Smart suggestions</li>
+              <li><i class="fas fa-check"></i> Continuous learning</li>
+            </ul>
+          </div>
+
+          <div class="feature-card" data-aos="fade-up" data-aos-delay="500">
+            <div class="feature-icon">
+              <i class="fas fa-chart-pie"></i>
+            </div>
+            <h3>Advanced Analytics</h3>
+            <p>
+              Gain insights into your productivity patterns with comprehensive
+              analytics and mood tracking.
+            </p>
+            <ul class="feature-list">
+              <li><i class="fas fa-check"></i> Completion rate tracking</li>
+              <li><i class="fas fa-check"></i> Mood analysis with charts</li>
+              <li><i class="fas fa-check"></i> Streak monitoring</li>
+              <li><i class="fas fa-check"></i> Burndown charts</li>
+            </ul>
+          </div>
+
+          <div class="feature-card" data-aos="fade-up" data-aos-delay="600">
+            <div class="feature-icon">
+              <i class="fas fa-stopwatch"></i>
+            </div>
+            <h3>Focus & Time Management</h3>
+            <p>
+              Built-in Pomodoro timers and focus modes help you maintain
+              concentration and work efficiently.
+            </p>
+            <ul class="feature-list">
+              <li><i class="fas fa-check"></i> Pomodoro timer integration</li>
+              <li><i class="fas fa-check"></i> Focus mode sessions</li>
+              <li><i class="fas fa-check"></i> Break reminders</li>
+              <li><i class="fas fa-check"></i> Time tracking</li>
+            </ul>
+          </div>
+
+          <div class="feature-card" data-aos="fade-up" data-aos-delay="700">
+            <div class="feature-icon">
+              <i class="fas fa-shield-alt"></i>
+            </div>
+            <h3>Secure & Private</h3>
+            <p>
+              Your data is protected with enterprise-grade security and Firebase
+              authentication.
+            </p>
+            <ul class="feature-list">
+              <li><i class="fas fa-check"></i> Firebase Authentication</li>
+              <li><i class="fas fa-check"></i> Secure data storage</li>
+              <li><i class="fas fa-check"></i> User data isolation</li>
+              <li><i class="fas fa-check"></i> Privacy-first design</li>
+            </ul>
+          </div>
+
+          <div class="feature-card" data-aos="fade-up" data-aos-delay="800">
+            <div class="feature-icon">
+              <i class="fas fa-mobile-alt"></i>
+            </div>
+            <h3>Mobile Responsive</h3>
+            <p>
+              Access your tasks anywhere with our fully responsive design that
+              works on all devices.
+            </p>
+            <ul class="feature-list">
+              <li><i class="fas fa-check"></i> Mobile-first design</li>
+              <li><i class="fas fa-check"></i> Touch-friendly interface</li>
+              <li><i class="fas fa-check"></i> Offline capabilities</li>
+              <li><i class="fas fa-check"></i> Cross-platform sync</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section class="benefits-section" id="benefits">
+      <div class="benefits-container">
+        <div class="section-header">
+          <h2 class="section-title" data-aos="fade-up">
+            Why Choose PriorityHelp AI?
+          </h2>
+          <!-- <p class="section-subtitle" data-aos="fade-up" data-aos-delay="200">
+            Join thousands of users who have transformed their productivity
+          </p> -->
+        </div>
+
+        <div class="benefits-grid">
+          <div class="benefit-card" data-aos="fade-right" data-aos-delay="300">
+            <div class="benefit-number">01</div>
+            <h3>Reduce Decision Fatigue</h3>
+            <p>
+              Stop wasting mental energy deciding what to work on next. Our AI
+              automatically prioritizes your tasks based on importance, urgency,
+              and context.
+            </p>
+          </div>
+
+          <div class="benefit-card" data-aos="fade-right" data-aos-delay="400">
+            <div class="benefit-number">02</div>
+            <h3>Increase Completion Rates</h3>
+            <p>
+              Users report 40% higher task completion rates with our intelligent
+              prioritization and progress tracking features.
+            </p>
+          </div>
+
+          <div class="benefit-card" data-aos="fade-right" data-aos-delay="500">
+            <div class="benefit-number">03</div>
+            <h3>Better Work-Life Balance</h3>
+            <p>
+              Focus mode and mood tracking help you maintain healthy
+              productivity habits and avoid burnout.
+            </p>
+          </div>
+
+          <div class="benefit-card" data-aos="fade-right" data-aos-delay="600">
+            <div class="benefit-number">04</div>
+            <h3>Data-Driven Insights</h3>
+            <p>
+              Understand your productivity patterns with comprehensive analytics
+              and make informed decisions about your workflow.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <!-- <section class="testimonials-section" id="testimonials">
+      <div class="testimonials-container">
+        <div class="section-header">
+          <h2 class="section-title" data-aos="fade-up">What Our Users Say</h2>
+          <p class="section-subtitle" data-aos="fade-up" data-aos-delay="200">
+            Real feedback from productivity enthusiasts
+          </p>
+        </div>
+
+        <div class="testimonials-grid">
+          <div class="testimonial-card" data-aos="fade-up" data-aos-delay="300">
+            <div class="testimonial-content">
+              <div class="stars">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+              </div>
+              <p>
+                "PriorityHelp AI has completely transformed how I manage my
+                daily tasks. The AI prioritization is incredibly accurate and
+                saves me hours of planning time."
+              </p>
+            </div>
+            <div class="testimonial-author">
+              <div class="author-avatar">
+                <i class="fas fa-user"></i>
+              </div>
+              <div class="author-info">
+                <h4>Sarah Johnson</h4>
+                <span>Project Manager</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="testimonial-card" data-aos="fade-up" data-aos-delay="400">
+            <div class="testimonial-content">
+              <div class="stars">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+              </div>
+              <p>
+                "The analytics dashboard gives me incredible insights into my
+                productivity patterns. I can see exactly when I'm most
+                productive and plan accordingly."
+              </p>
+            </div>
+            <div class="testimonial-author">
+              <div class="author-avatar">
+                <i class="fas fa-user"></i>
+              </div>
+              <div class="author-info">
+                <h4>Michael Chen</h4>
+                <span>Software Developer</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="testimonial-card" data-aos="fade-up" data-aos-delay="500">
+            <div class="testimonial-content">
+              <div class="stars">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+              </div>
+              <p>
+                "The focus mode with Pomodoro timers has helped me maintain
+                concentration for longer periods. My productivity has increased
+                by at least 30%."
+              </p>
+            </div>
+            <div class="testimonial-author">
+              <div class="author-avatar">
+                <i class="fas fa-user"></i>
+              </div>
+              <div class="author-info">
+                <h4>Emily Rodriguez</h4>
+                <span>Marketing Specialist</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section> -->
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+      <div class="cta-container">
+        <div class="cta-content" data-aos="fade-up">
+          <h2>Ready to Transform Your Productivity?</h2>
+          <!-- <p>
+            Join thousands of users who have already discovered the power of
+            AI-driven task management.
+          </p> -->
+          <div class="cta-buttons">
+            <a href="login.html#register" class="btn btn-primary btn-hero">
+              <i class="fas fa-rocket"></i>
+              Start Your Free Journey
+            </a>
+            <a href="login.html" class="btn btn-secondary btn-hero">
+              <i class="fas fa-sign-in-alt"></i>
+              Sign In Now
+            </a>
+          </div>
+          <p class="cta-note">• Get started in 30 seconds</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="landing-footer">
+      <div class="footer-container">
+        <div class="footer-content">
+          <div class="footer-logo">
+            <div class="logo-section">
+              <div class="logo-placeholder">
+                <img
+                  src="https://shorturl.at/cQmMr"
+                  alt="PriorityHelp AI Logo"
+                />
+              </div>
+              <div class="logo-text">PriorityHelp AI</div>
+            </div>
+            <p>Smart task management powered by artificial intelligence.</p>
+          </div>
+
+          <div class="footer-links">
+            <div class="footer-column">
+              <!-- <h4>Product</h4>
+              <a href="#features">Features</a>
+              <a href="#benefits">Benefits</a>
+              <a href="login.html">Sign In</a>
+              <a href="login.html#register">Get Started</a> -->
+            </div>
+
+            <!-- <div class="footer-column">
+              <h4>Support</h4>
+              <a href="#help">Help Center</a>
+              <a href="#contact">Contact Us</a>
+              <a href="#privacy">Privacy Policy</a>
+              <a href="#terms">Terms of Service</a>
+            </div> -->
+            <div class="footer-column">
+              <h4>Product</h4>
+              <a href="#features">Features</a>
+              <a href="#benefits">Benefits</a>
+              <a href="login.html">Sign In</a>
+              <a href="login.html#register">Get Started</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer-bottom">
+          <p>
+            &copy; 2024 PriorityHelp AI. Created by Devan. All rights reserved.
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- AOS Animation Library -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <script>
+      // Initialize AOS animations
+      AOS.init({
+        duration: 800,
+        easing: "ease-in-out",
+        once: true,
+        offset: 100,
+      });
+
+      // Header scroll effect
+      window.addEventListener("scroll", function () {
+        const header = document.querySelector(".landing-header");
+        if (window.scrollY > 50) {
+          header.style.background = "rgba(255, 255, 255, 0.95)";
+          header.style.backdropFilter = "blur(10px)";
+        } else {
+          header.style.background = "var(--ph-new-white)";
+          header.style.backdropFilter = "none";
+        }
+      });
+
+      // Smooth scrolling for navigation links
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener("click", function (e) {
+          e.preventDefault();
+          const target = document.querySelector(this.getAttribute("href"));
+          if (target) {
+            target.scrollIntoView({
+              behavior: "smooth",
+              block: "start",
+            });
+          }
+        });
+      });
+
+      // Handle register link hash
+      if (window.location.hash === "#register") {
+        window.location.href = "login.html#register";
+      }
+    </script>
+  </body>
+</html>
