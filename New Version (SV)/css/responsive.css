@@ -1,0 +1,355 @@
+/* === RESPONSIVE STYLES === */
+
+/* Mobile First Approach */
+
+/* Extra Small Devices (phones, 576px and down) */
+@media (max-width: 575.98px) {
+  .main-app-layout {
+    padding: 0 var(--spacing-sm);
+  }
+
+  .header-content {
+    flex-direction: column;
+    gap: var(--spacing-md);
+    padding: var(--spacing-sm);
+  }
+
+  .nav-section {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    width: 100%;
+  }
+
+  .date-controls {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--spacing-sm);
+  }
+
+  #current-date-display {
+    font-size: 0.9rem;
+  }
+
+  /* Task Columns */
+  #task-columns-container {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+  }
+
+  .task-column {
+    padding: var(--spacing-md);
+    min-height: 300px;
+  }
+
+  .task-column h3 {
+    font-size: 1.1rem;
+  }
+
+  .task-column li {
+    padding: var(--spacing-sm);
+  }
+
+  .task-main-content {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+
+  .task-actions {
+    align-self: flex-end;
+  }
+
+  .task-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-xs);
+  }
+
+  /* Modal Adjustments */
+  .modal-content {
+    width: 95%;
+    padding: var(--spacing-lg);
+    margin: var(--spacing-md);
+  }
+
+  .modal-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+  }
+
+  /* Progress Containers */
+  .overall-progress-container,
+  .carry-forward-container {
+    padding: var(--spacing-md);
+  }
+
+  .overall-progress-header,
+  .carry-forward-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+  }
+
+  /* User Section */
+  .user-section {
+    width: 100%;
+  }
+
+  .name-section {
+    justify-content: center;
+  }
+
+  .name-dropdown {
+    left: 50%;
+    transform: translateX(-50%) translateY(-10px);
+    width: 200px;
+  }
+
+  .name-dropdown.show {
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* Small Devices (landscape phones, 576px and up) */
+@media (min-width: 576px) and (max-width: 767.98px) {
+  #task-columns-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .header-content {
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+  }
+
+  .nav-section {
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+  }
+}
+
+/* Medium Devices (tablets, 768px and up) */
+@media (min-width: 768px) and (max-width: 991.98px) {
+  #task-columns-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .task-column {
+    min-height: 350px;
+  }
+
+  .modal-content {
+    max-width: 600px;
+  }
+}
+
+/* Large Devices (desktops, 992px and up) */
+@media (min-width: 992px) and (max-width: 1199.98px) {
+  #task-columns-container {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .main-app-layout {
+    max-width: 1200px;
+  }
+}
+
+/* Extra Large Devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) {
+  #task-columns-container {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .main-app-layout {
+    max-width: 1400px;
+  }
+
+  .task-column {
+    min-height: 400px;
+  }
+}
+
+/* Ultra Wide Screens (1600px and up) */
+@media (min-width: 1600px) {
+  .main-app-layout {
+    max-width: 1600px;
+  }
+
+  #task-columns-container {
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-xl);
+  }
+}
+
+/* Landscape Orientation Adjustments */
+@media (orientation: landscape) and (max-height: 600px) {
+  .header {
+    padding: var(--spacing-sm) 0;
+  }
+
+  .content-container {
+    padding: var(--spacing-md) 0;
+  }
+
+  .task-column {
+    min-height: 250px;
+  }
+
+  .modal-content {
+    max-height: 70vh;
+  }
+}
+
+/* High DPI Displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .logo {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* Reduced Motion Preferences */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .task-column:hover,
+  .card:hover,
+  .task-column li:hover {
+    transform: none;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .task-column li {
+    background: #3a3a3a;
+    border-color: #555;
+    color: #fff;
+  }
+
+  .task-column li:hover {
+    background: #4a4a4a;
+  }
+
+  .task-column li.completed {
+    background: #2d4a2d;
+    border-color: #4a7c59;
+  }
+
+  .motivational-quote {
+    background: linear-gradient(135deg, #3a4a3a 0%, #2d3a2d 100%);
+    color: #ccc;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .header,
+  .nav-section,
+  .modal,
+  .task-actions,
+  .carry-forward-container {
+    display: none !important;
+  }
+
+  .main-app-layout {
+    max-width: none;
+    padding: 0;
+  }
+
+  #task-columns-container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-md);
+  }
+
+  .task-column {
+    break-inside: avoid;
+    box-shadow: none;
+    border: 1px solid #000;
+  }
+
+  .task-column li {
+    break-inside: avoid;
+    box-shadow: none;
+  }
+
+  .task-text {
+    color: #000 !important;
+  }
+
+  .overall-progress-container {
+    break-inside: avoid;
+  }
+}
+
+/* Focus and Accessibility */
+@media (prefers-reduced-motion: no-preference) {
+  .task-column li:focus-within {
+    transform: translateY(-2px);
+    box-shadow: var(--ph-new-shadow-medium);
+  }
+}
+
+/* Touch Device Optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .task-complete-icon,
+  .task-abort-icon {
+    font-size: 1.3em;
+    padding: var(--spacing-sm);
+  }
+
+  .task-actions {
+    gap: var(--spacing-md);
+  }
+
+  .nav-btn {
+    padding: var(--spacing-md);
+    font-size: 1rem;
+  }
+
+  .date-controls i {
+    padding: var(--spacing-md);
+    font-size: 1.2em;
+  }
+}
+
+/* Hover-capable Device Enhancements */
+@media (hover: hover) and (pointer: fine) {
+  .task-column li::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, transparent 0%, rgba(74, 124, 89, 0.05) 100%);
+    opacity: 0;
+    transition: var(--transition-normal);
+    border-radius: var(--radius-md);
+  }
+
+  .task-column li:hover::before {
+    opacity: 1;
+  }
+}
+
+/* Container Queries (Future-proofing) */
+@supports (container-type: inline-size) {
+  .task-column {
+    container-type: inline-size;
+  }
+
+  @container (max-width: 250px) {
+    .task-meta {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .task-priority-indicators {
+      margin-top: var(--spacing-xs);
+    }
+  }
+}
