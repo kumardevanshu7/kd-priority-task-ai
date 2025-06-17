@@ -3206,6 +3206,7 @@
       let analyzedTaskDataForSelectedDate = null;
       let selectedDate = new Date();
       let completionByCategoryChartInstance = null;
+      let completedTasksTracker = new Set(); // Track completed carried-forward tasks
 
       // --- DOM Elements ---
       const taskInputModalEl = document.getElementById("task-input-modal");
@@ -4604,7 +4605,7 @@
 
               if (docSnap.exists()) {
                 const data = docSnap.data();
-                const incompleteTasks = getIncompleteTasks(data);
+                const incompleteTasks = getIncompleteTasks(data, dateKey);
 
                 if (countOnly) {
                   totalCount += incompleteTasks.length;
@@ -4622,7 +4623,29 @@
             }
           }
 
-          return countOnly ? totalCount : allIncompleteTasks;
+          if (countOnly) {
+            return totalCount;
+          }
+
+          // Remove duplicates (filtering for completed tasks is now done in getIncompleteTasks)
+          const uniqueTasks = [];
+          const seenTasks = new Set();
+
+          allIncompleteTasks.forEach((task) => {
+            const taskKey =
+              `${task.task}_${task.originalCategory}`.toLowerCase();
+
+            // Skip if already seen (duplicate)
+            if (seenTasks.has(taskKey)) {
+              return;
+            }
+
+            // Add unique task (completion filtering already done in getIncompleteTasks)
+            seenTasks.add(taskKey);
+            uniqueTasks.push(task);
+          });
+
+          return uniqueTasks;
         } catch (error) {
           console.error("Error getting all previous incomplete tasks:", error);
           return countOnly ? 0 : [];
@@ -4706,19 +4729,33 @@
         }
       }
 
-      function getIncompleteTasks(taskData) {
+      function getIncompleteTasks(taskData, dateKey = null) {
         const incompleteTasks = [];
         if (!taskData) return incompleteTasks;
 
         Object.keys(taskData).forEach((category) => {
           if (Array.isArray(taskData[category])) {
             taskData[category].forEach((task) => {
+              // Primary check: task must not be completed in Firestore
               if (!task.completed) {
-                // Aborted tasks are completely removed, so no need to check for them
-                incompleteTasks.push({
-                  ...task,
-                  originalCategory: category,
-                });
+                // Create unique task ID for tracking completion across dates
+                const taskId = dateKey
+                  ? `${task.task}_${category}_${dateKey}`
+                      .replace(/\s+/g, "_")
+                      .toLowerCase()
+                  : `${task.task}_${category}`
+                      .replace(/\s+/g, "_")
+                      .toLowerCase();
+
+                // Secondary check: also check completedTasksTracker for immediate session consistency
+                // This handles cases where a task was just completed but Firestore hasn't been updated yet
+                if (!completedTasksTracker.has(taskId)) {
+                  incompleteTasks.push({
+                    ...task,
+                    originalCategory: category,
+                    taskId: taskId,
+                  });
+                }
               }
             });
           }
@@ -4757,6 +4794,314 @@
         const suffixes = ["th", "st", "nd", "rd"];
         const v = num % 100;
         return num + (suffixes[(v - 20) % 10] || suffixes[v] || suffixes[0]);
+      }
+
+      // Load and save completed tasks tracker
+      function loadCompletedTasksTracker() {
+        if (!currentUser) return;
+
+        try {
+          const saved = localStorage.getItem(
+            `completedTasks_${currentUser.uid}`
+          );
+          if (saved) {
+            completedTasksTracker = new Set(JSON.parse(saved));
+          } else {
+          }
+        } catch (error) {
+          console.error("Error loading completed tasks tracker:", error);
+          completedTasksTracker = new Set();
+        }
+      }
+
+      function saveCompletedTasksTracker() {
+        if (!currentUser) return;
+
+        try {
+          localStorage.setItem(
+            `completedTasks_${currentUser.uid}`,
+            JSON.stringify([...completedTasksTracker])
+          );
+        } catch (error) {
+          console.error("Error saving completed tasks tracker:", error);
+        }
+      }
+
+      // Clean up old entries from completed tasks tracker (older than 60 days)
+      function cleanupCompletedTasksTracker() {
+        if (!currentUser) return;
+
+        try {
+          const cutoffDate = new Date();
+          cutoffDate.setDate(cutoffDate.getDate() - 60); // 60 days ago
+          const cutoffDateStr = formatDate(cutoffDate);
+
+          const originalSize = completedTasksTracker.size;
+          const cleanedTracker = new Set();
+
+          completedTasksTracker.forEach((taskId) => {
+            // Extract date from taskId (format: task_category_date)
+            const parts = taskId.split("_");
+            const dateStr = parts[parts.length - 1];
+
+            // Keep entries that don't have date format or are recent enough
+            if (
+              !dateStr.match(/^\d{4}-\d{2}-\d{2}$/) ||
+              dateStr >= cutoffDateStr
+            ) {
+              cleanedTracker.add(taskId);
+            }
+          });
+
+          completedTasksTracker = cleanedTracker;
+
+          if (originalSize !== completedTasksTracker.size) {
+            saveCompletedTasksTracker();
+          }
+        } catch (error) {
+          console.error("Error cleaning up completed tasks tracker:", error);
+        }
+      }
+
+      // Debug function to clear completed tasks tracker (can be called from console)
+      window.clearCompletedTasksTracker = function () {
+        if (!currentUser) {
+          console.log("❌ No authenticated user");
+          return;
+        }
+
+        const originalSize = completedTasksTracker.size;
+        completedTasksTracker.clear();
+        saveCompletedTasksTracker();
+        console.log(
+          `🧹 Cleared completed tasks tracker (had ${originalSize} entries)`
+        );
+      };
+
+      // Debug function to show completed tasks tracker (can be called from console)
+      window.showCompletedTasksTracker = function () {
+        if (!currentUser) {
+          console.log("❌ No authenticated user");
+          return;
+        }
+
+        console.log(
+          `📋 Completed tasks tracker (${completedTasksTracker.size} entries):`
+        );
+        [...completedTasksTracker].forEach((taskId) => {
+          console.log(`  - ${taskId}`);
+        });
+      };
+
+      // Handle completion of carried-forward tasks
+      async function handleCarriedForwardTaskCompletion(taskItem) {
+        if (!currentUser || !taskItem.originalDate) return;
+
+        try {
+          const currentDateStr = formatDate(selectedDate);
+
+          // Add completion info to current task
+          taskItem.completedOnDate = currentDateStr;
+          taskItem.completionNote = `Completed on ${currentDateStr}`;
+
+          // Create a unique task identifier based on task text and original category
+          const uniqueTaskIdentifier =
+            `${taskItem.task}_${taskItem.originalCategory}`
+              .toLowerCase()
+              .replace(/\s+/g, "_");
+
+          // Find ALL dates where this task exists and update them
+          await updateAllInstancesOfTask(
+            uniqueTaskIdentifier,
+            taskItem.task,
+            taskItem.originalCategory,
+            currentDateStr,
+            true // mark as completed
+          );
+        } catch (error) {
+          console.error(
+            "Error handling carried-forward task completion:",
+            error
+          );
+        }
+      }
+
+      // Handle uncompletion of carried-forward tasks
+      async function handleCarriedForwardTaskUncompletion(taskItem) {
+        if (!currentUser || !taskItem.originalDate) return;
+
+        try {
+          // Create a unique task identifier based on task text and original category
+          const uniqueTaskIdentifier =
+            `${taskItem.task}_${taskItem.originalCategory}`
+              .toLowerCase()
+              .replace(/\s+/g, "_");
+
+          // Find ALL dates where this task exists and mark as uncompleted
+          await updateAllInstancesOfTask(
+            uniqueTaskIdentifier,
+            taskItem.task,
+            taskItem.originalCategory,
+            null,
+            false // mark as uncompleted
+          );
+        } catch (error) {
+          console.error(
+            "Error handling carried-forward task uncompletion:",
+            error
+          );
+        }
+      }
+
+      // Update ALL instances of a task across all dates
+      async function updateAllInstancesOfTask(
+        uniqueTaskIdentifier,
+        taskText,
+        originalCategory,
+        completedOnDate,
+        isCompleted
+      ) {
+        if (!currentUser) return;
+
+        try {
+          // Search through the last 60 days to find all instances of this task
+          const searchDays = 60;
+          const updatePromises = [];
+
+          for (let i = 0; i < searchDays; i++) {
+            const checkDate = new Date(
+              selectedDate.getTime() - i * 24 * 60 * 60 * 1000
+            );
+            const dateKey = formatDate(checkDate);
+
+            // Create a promise for each date check and update
+            const updatePromise = updateTaskInSpecificDate(
+              dateKey,
+              taskText,
+              originalCategory,
+              completedOnDate,
+              isCompleted
+            );
+            updatePromises.push(updatePromise);
+          }
+
+          // Execute all updates in parallel for better performance
+          await Promise.all(updatePromises);
+
+          // Update completedTasksTracker for immediate filtering
+          if (isCompleted) {
+            // Add all possible taskIds for this task to the tracker
+            for (let i = 0; i < searchDays; i++) {
+              const checkDate = new Date(
+                selectedDate.getTime() - i * 24 * 60 * 60 * 1000
+              );
+              const dateKey = formatDate(checkDate);
+              const taskId = `${taskText}_${originalCategory}_${dateKey}`
+                .replace(/\s+/g, "_")
+                .toLowerCase();
+              completedTasksTracker.add(taskId);
+            }
+          } else {
+            // Remove all possible taskIds for this task from the tracker
+            for (let i = 0; i < searchDays; i++) {
+              const checkDate = new Date(
+                selectedDate.getTime() - i * 24 * 60 * 60 * 1000
+              );
+              const dateKey = formatDate(checkDate);
+              const taskId = `${taskText}_${originalCategory}_${dateKey}`
+                .replace(/\s+/g, "_")
+                .toLowerCase();
+              completedTasksTracker.delete(taskId);
+            }
+          }
+          saveCompletedTasksTracker();
+        } catch (error) {
+          console.error("Error updating all instances of task:", error);
+        }
+      }
+
+      // Update a task in a specific date's document
+      async function updateTaskInSpecificDate(
+        dateKey,
+        taskText,
+        originalCategory,
+        completedOnDate,
+        isCompleted
+      ) {
+        if (!currentUser) return;
+
+        try {
+          const docRef = doc(db, "dailyTasks", `${currentUser.uid}-${dateKey}`);
+          const docSnap = await getDoc(docRef);
+
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            let hasChanges = false;
+
+            // Find and update the specific task
+            if (
+              data[originalCategory] &&
+              Array.isArray(data[originalCategory])
+            ) {
+              data[originalCategory].forEach((task, index) => {
+                if (task.task === taskText) {
+                  if (isCompleted) {
+                    // Mark as completed and add completion info
+                    data[originalCategory][index].completed = true;
+                    data[originalCategory][index].completedOnDate =
+                      completedOnDate;
+                    data[originalCategory][
+                      index
+                    ].completionNote = `Completed on ${completedOnDate}`;
+                  } else {
+                    // Mark as uncompleted and remove completion info
+                    data[originalCategory][index].completed = false;
+                    delete data[originalCategory][index].completedOnDate;
+                    delete data[originalCategory][index].completionNote;
+                  }
+                  hasChanges = true;
+                }
+              });
+            }
+
+            // Save updated data back to Firestore only if there were changes
+            if (hasChanges) {
+              await setDoc(docRef, { ...data, lastUpdated: Timestamp.now() });
+            }
+          }
+        } catch (error) {
+          // Silently handle errors for dates that don't exist (normal case)
+          // Only log if it's a real error, not a missing document
+          if (error.code !== "not-found") {
+            console.error(`Error updating task in date ${dateKey}:`, error);
+          }
+        }
+      }
+
+      // Handle abortion of carried-forward tasks (abortion = completion for tracking purposes)
+      async function handleCarriedForwardTaskAbortion(taskItem) {
+        if (!currentUser || !taskItem.originalDate) return;
+
+        try {
+          const currentDateStr = formatDate(selectedDate);
+
+          // Create a unique task identifier based on task text and original category
+          const uniqueTaskIdentifier =
+            `${taskItem.task}_${taskItem.originalCategory}`
+              .toLowerCase()
+              .replace(/\s+/g, "_");
+
+          // Find ALL dates where this task exists and mark as completed (aborted)
+          await updateAllInstancesOfTask(
+            uniqueTaskIdentifier,
+            taskItem.task,
+            taskItem.originalCategory,
+            `${currentDateStr} (aborted)`,
+            true // mark as completed
+          );
+        } catch (error) {
+          console.error("Error handling carried-forward task abortion:", error);
+        }
       }
 
       async function loadCurrentStreak() {
@@ -5282,12 +5627,7 @@
           const tasksInCategory = analyzedTaskDataForSelectedDate[categoryKey];
           if (tasksInCategory && Array.isArray(tasksInCategory)) {
             tasksInCategory.forEach((task) => {
-              if (
-                task &&
-                typeof task === "object" &&
-                "task" in task &&
-                !task.aborted
-              ) {
+              if (task && typeof task === "object" && "task" in task) {
                 totalCreated++;
                 if (task.completed) totalCompleted++;
               }
@@ -5382,6 +5722,7 @@
               );
               tickIcon.addEventListener("click", async (e) => {
                 e.stopPropagation();
+
                 taskItem.completed = !taskItem.completed;
 
                 // Update UI immediately for better UX
@@ -5399,15 +5740,27 @@
                 // Show mood selection for completed tasks
                 if (taskItem.completed) {
                   showMoodSelection(taskItem, categoryKeyFromMap);
+
+                  // If this is a carried-forward task, handle completion properly
+                  if (taskItem.isCarriedForward && taskItem.originalDate) {
+                    await handleCarriedForwardTaskCompletion(taskItem);
+                  }
                 } else {
                   // Remove mood if task is uncompleted
                   delete taskItem.mood;
                   delete taskItem.moodEmoji;
+                  delete taskItem.completedOnDate;
+                  delete taskItem.completionNote;
                   const moodIndicator = li.querySelector(
                     ".task-mood-indicator"
                   );
                   if (moodIndicator) {
                     moodIndicator.remove();
+                  }
+
+                  // If this is a carried-forward task, handle uncompletion
+                  if (taskItem.isCarriedForward && taskItem.originalDate) {
+                    await handleCarriedForwardTaskUncompletion(taskItem);
                   }
                 }
 
@@ -5457,6 +5810,11 @@
                     analyzedTaskDataForSelectedDate
                   );
 
+                  // If this is a carried-forward task, handle abortion properly
+                  if (taskItem.isCarriedForward && taskItem.originalDate) {
+                    await handleCarriedForwardTaskAbortion(taskItem);
+                  }
+
                   // Task aborted silently
                 } catch (error) {
                   console.error("Error aborting task:", error);
@@ -5481,7 +5839,9 @@
               if (taskItem.isCarriedForward && taskItem.carryForwardCount) {
                 const carryCountDiv = document.createElement("div");
                 carryCountDiv.classList.add("carry-forward-count");
-                const ordinal = getOrdinal(taskItem.carryForwardCount + 1);
+                // carryForwardCount 1 means 2nd time (original + 1 carry forward)
+                const totalTimes = taskItem.carryForwardCount + 1;
+                const ordinal = getOrdinal(totalTimes);
                 carryCountDiv.textContent = `↻ ${ordinal} time running this task`;
                 li.appendChild(carryCountDiv);
               }
@@ -5907,6 +6267,11 @@
               // User is signed in
               currentUser = user;
               console.log("User authenticated successfully:", user.email);
+
+              // Load completed tasks tracker for this user
+              loadCompletedTasksTracker();
+              // Clean up old entries
+              cleanupCompletedTasksTracker();
 
               // Hide auth loading screen with a small delay to ensure smooth transition
               setTimeout(async () => {
