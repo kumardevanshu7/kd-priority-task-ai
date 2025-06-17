@@ -1172,6 +1172,18 @@
         display: inline-block;
       }
 
+      .task-completion-note {
+        font-size: 0.7em;
+        color: #27ae60;
+        font-weight: 600;
+        background: rgba(39, 174, 96, 0.1);
+        padding: 2px 6px;
+        border-radius: 4px;
+        margin-top: 4px;
+        display: inline-block;
+        border-left: 2px solid #27ae60;
+      }
+
       /* Task Actions */
       .task-actions {
         display: flex;
@@ -4747,9 +4759,14 @@
                       .replace(/\s+/g, "_")
                       .toLowerCase();
 
+                // Create unique task key for completedTasksTracker check
+                const uniqueTaskKey = `${task.task}_${category}`
+                  .replace(/\s+/g, "_")
+                  .toLowerCase();
+
                 // Secondary check: also check completedTasksTracker for immediate session consistency
                 // This handles cases where a task was just completed but Firestore hasn't been updated yet
-                if (!completedTasksTracker.has(taskId)) {
+                if (!completedTasksTracker.has(uniqueTaskKey)) {
                   incompleteTasks.push({
                     ...task,
                     originalCategory: category,
@@ -4989,30 +5006,15 @@
           await Promise.all(updatePromises);
 
           // Update completedTasksTracker for immediate filtering
+          // Only add/remove the unique task identifier, not all date-specific IDs
+          const uniqueTaskKey = `${taskText}_${originalCategory}`
+            .replace(/\s+/g, "_")
+            .toLowerCase();
+
           if (isCompleted) {
-            // Add all possible taskIds for this task to the tracker
-            for (let i = 0; i < searchDays; i++) {
-              const checkDate = new Date(
-                selectedDate.getTime() - i * 24 * 60 * 60 * 1000
-              );
-              const dateKey = formatDate(checkDate);
-              const taskId = `${taskText}_${originalCategory}_${dateKey}`
-                .replace(/\s+/g, "_")
-                .toLowerCase();
-              completedTasksTracker.add(taskId);
-            }
+            completedTasksTracker.add(uniqueTaskKey);
           } else {
-            // Remove all possible taskIds for this task from the tracker
-            for (let i = 0; i < searchDays; i++) {
-              const checkDate = new Date(
-                selectedDate.getTime() - i * 24 * 60 * 60 * 1000
-              );
-              const dateKey = formatDate(checkDate);
-              const taskId = `${taskText}_${originalCategory}_${dateKey}`
-                .replace(/\s+/g, "_")
-                .toLowerCase();
-              completedTasksTracker.delete(taskId);
-            }
+            completedTasksTracker.delete(uniqueTaskKey);
           }
           saveCompletedTasksTracker();
         } catch (error) {
@@ -5844,6 +5846,14 @@
                 const ordinal = getOrdinal(totalTimes);
                 carryCountDiv.textContent = `↻ ${ordinal} time running this task`;
                 li.appendChild(carryCountDiv);
+              }
+
+              // Completion message for completed tasks
+              if (taskItem.completed && taskItem.completionNote) {
+                const completionDiv = document.createElement("div");
+                completionDiv.classList.add("task-completion-note");
+                completionDiv.textContent = `✅ ${taskItem.completionNote}`;
+                li.appendChild(completionDiv);
               }
 
               // Enhanced meta section with priority score and confidence
