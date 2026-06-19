@@ -1,0 +1,431 @@
+:root {
+  color-scheme: light;
+  /* Premium Minimalist Beige & Mint Theme Colors */
+  --ph-new-bg-page: #f7f5f0; /* Soft warm beige page background */
+  --ph-new-white: #ffffff;
+  --ph-new-dark-green: #1a251e; /* Dark slate text / background */
+  --ph-new-medium-green: #48574e; /* Medium grey-green text */
+  --ph-new-light-green: #0da681; /* Premium Mint Green accent (from 2nd pic) */
+  --ph-new-soft-green-bg: #e6f6f2; /* Very soft light mint green highlight */
+  --ph-new-border-color: #e6e4df; /* Clean beige border */
+  --ph-new-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+  --ph-new-shadow-hover: 0 12px 30px rgba(0, 0, 0, 0.04);
+
+  --ph-new-text-dark: var(--ph-new-dark-green);
+  --ph-new-text-medium: var(--ph-new-medium-green);
+  --ph-new-text-light-on-dark: var(--ph-new-white);
+  --ph-new-text-placeholder: #8ea092;
+
+  --font-primary: "Plus Jakarta Sans", sans-serif;
+  --font-headings: "Outfit", sans-serif;
+
+  /* Accent colors */
+  --accent-blue: #0284c7;
+  --accent-red: #ea580c;
+  --accent-green: var(--ph-new-light-green);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* CRITICAL: Fix for stuck loading spinner */
+.hidden {
+  display: none !important;
+}
+
+body {
+  color-scheme: light !important;
+  font-family: var(--font-primary);
+  background-color: var(--ph-new-bg-page);
+  color: var(--ph-new-text-dark);
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Split Screen Container */
+.split-container {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* Left Column: Hero Brand Column */
+.split-left {
+  flex: 0 0 45%;
+  background: linear-gradient(135deg, #1a251e 0%, #223027 50%, #2e3a31 100%);
+  color: var(--ph-new-white);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 60px;
+  overflow: hidden;
+  z-index: 2;
+  border-right: 1px solid var(--ph-new-border-color);
+}
+
+/* Glowing Ambient Background Blobs (Soft, clean green light) */
+.ambient-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.25;
+}
+
+.blob-1 {
+  top: -100px;
+  right: -50px;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(13, 166, 129, 0.3) 0%, rgba(26, 37, 30, 0) 70%);
+  animation: float-blob-1 15s ease-in-out infinite alternate;
+}
+
+.blob-2 {
+  bottom: -100px;
+  left: -50px;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(72, 87, 78, 0.2) 0%, rgba(26, 37, 30, 0) 70%);
+  animation: float-blob-2 18s ease-in-out infinite alternate;
+}
+
+@keyframes float-blob-1 {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(30px, 20px) scale(1.08); }
+}
+
+@keyframes float-blob-2 {
+  0% { transform: translate(0, 0) scale(1.08); }
+  100% { transform: translate(-20px, -30px) scale(0.95); }
+}
+
+/* Brand Details (Left Column) */
+.brand-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: var(--ph-new-white);
+}
+
+.brand-logo-wrapper {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px; /* Clean uniform corner */
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+.brand-logo-wrapper:hover {
+  transform: scale(1.05);
+}
+
+.brand-logo-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.brand-name {
+  font-family: var(--font-headings);
+  font-size: 1.4em;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.brand-hero-content {
+  margin: auto 0;
+  max-width: 440px;
+}
+
+.brand-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.82em;
+  font-weight: 700;
+  color: #ccd5ce;
+  margin-bottom: 20px;
+  width: fit-content;
+}
+
+.brand-title {
+  font-family: var(--font-headings);
+  font-size: 3em;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -1.2px;
+  margin-bottom: 18px;
+}
+
+.brand-title span {
+  color: var(--ph-new-light-green);
+}
+
+.brand-subtitle {
+  font-size: 1em;
+  color: rgba(255, 255, 255, 0.75);
+  line-height: 1.6;
+}
+
+.brand-footer {
+  font-size: 0.82em;
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 500;
+}
+
+/* Right Column: Form Column */
+.split-right {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  position: relative;
+  background-color: var(--ph-new-bg-page);
+}
+
+/* Back to Home Button */
+.back-to-home {
+  position: absolute;
+  top: 40px;
+  right: 40px;
+  background: var(--ph-new-white);
+  border: 1px solid var(--ph-new-border-color);
+  padding: 9px 18px;
+  border-radius: 10px; /* Clean uniform squircle */
+  color: var(--ph-new-dark-green);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.88em;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: var(--ph-new-shadow);
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.back-to-home:hover {
+  background: var(--ph-new-bg-page);
+  transform: translateY(-1px);
+  border-color: var(--ph-new-light-green);
+  box-shadow: var(--ph-new-shadow-hover);
+}
+
+/* Login Card Container */
+.login-container {
+  background: var(--ph-new-white);
+  border: 1px solid var(--ph-new-border-color);
+  border-radius: 20px; /* Clean uniform corners */
+  padding: 45px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+  position: relative;
+  z-index: 5;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.login-header {
+  text-align: left;
+  margin-bottom: 24px;
+}
+
+/* Hidden Logo on Desktop (since it is visible on the left side) */
+.login-header .logo-section {
+  display: none;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.login-header .logo-placeholder {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--ph-new-border-color);
+}
+
+.login-header .logo-placeholder img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.login-title {
+  font-family: var(--font-headings);
+  font-size: 1.9em;
+  font-weight: 800;
+  color: var(--ph-new-dark-green);
+  letter-spacing: -0.6px;
+}
+
+.login-subtitle {
+  color: var(--ph-new-text-medium);
+  font-size: 0.92em;
+  margin-top: 6px;
+  font-weight: 500;
+}
+
+/* Error/Success Alert Box */
+.error-message,
+.success-message {
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 0.85em;
+  font-weight: 600;
+  margin-bottom: 18px;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.error-message {
+  background: #fdf2f2;
+  color: var(--accent-red);
+  border: 1px solid rgba(234, 88, 12, 0.15);
+}
+
+.success-message {
+  background: #f0fdf4;
+  color: var(--ph-new-light-green);
+  border: 1px solid rgba(13, 166, 129, 0.15);
+}
+
+/* Google Login Button Styles */
+.google-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 13px 20px;
+  background: var(--ph-new-white);
+  border: 1px solid var(--ph-new-border-color);
+  border-radius: 10px; /* Clean uniform button */
+  color: var(--ph-new-dark-green);
+  font-family: var(--font-primary);
+  font-weight: 700;
+  font-size: 0.92em;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.01);
+  transition: all 0.2s ease;
+  margin-top: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+.google-button:hover {
+  background: var(--ph-new-dark-green);
+  border-color: var(--ph-new-dark-green);
+  color: var(--ph-new-white);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 15px rgba(26, 37, 30, 0.12);
+}
+
+.google-button:hover svg path {
+  fill: #ffffff !important;
+  transition: fill 0.2s ease;
+}
+
+.google-button:active {
+  transform: translateY(0);
+}
+
+.google-button:disabled {
+  background: #f5f5f5;
+  color: var(--ph-new-text-placeholder);
+  border-color: #e5e5e5;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.google-icon {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+}
+
+/* Spinner */
+.loading-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  border-top-color: var(--ph-new-white);
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.login-footer-notice {
+  text-align: center;
+  font-size: 0.78em;
+  color: var(--ph-new-text-placeholder);
+  margin-top: 24px;
+  line-height: 1.4;
+  font-weight: 500;
+}
+
+/* Mobile & Tablet Responsiveness */
+@media (max-width: 900px) {
+  .split-container {
+    flex-direction: column;
+  }
+
+  .split-left {
+    display: none;
+  }
+  
+  .split-right {
+    padding: 24px;
+    background-color: var(--ph-new-bg-page);
+    flex-direction: column;
+    justify-content: flex-start;
+    padding-top: 40px;
+  }
+
+  .login-header .logo-section {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 16px;
+  }
+
+  .login-header {
+    text-align: center;
+  }
+
+  .login-container {
+    padding: 32px 24px;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04);
+  }
+
+  .back-to-home {
+    position: static;
+    margin-bottom: 20px;
+    align-self: flex-start;
+  }
+}
